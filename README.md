@@ -2,7 +2,7 @@
 This project provides the backend services for a tool that simulates network failures and analyzes resilience. It handles graph processing, attack simulations, and streams results in real-time via WebSockets.
 ## You can access the frontend here 
 ``` shh
-https://github.com/rahulaharma/netfortify_frontend`
+https://github.com/rahulaharma/netfortify_frontend
 ```
 ## 🧠 What It Does
 This backend service is designed to answer a critical question: "If some parts of a network fail, will the rest still work?"
