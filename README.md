@@ -1,5 +1,6 @@
 # Real-Time Network Weakness Finder (Backend)
 This project provides the backend services for a tool that simulates network failures and analyzes resilience. It handles graph processing, attack simulations, and streams results in real-time via WebSockets.
+## You can access the frontend here `dd`
 ## 🧠 What It Does
 This backend service is designed to answer a critical question: "If some parts of a network fail, will the rest still work?"
 It provides endpoints to:
