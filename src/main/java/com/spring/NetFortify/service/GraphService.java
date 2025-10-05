@@ -21,7 +21,7 @@ public class GraphService {
     private Graph graph;
     private Graph origionalGraph;// to reset simulation
 
-    private final SimpMessagingTemplate simpMessagingTemplate;
+    private final SimpMessagingTemplate simpMessagingTemplate; // a class for sending websocket messages from server to client its .convertAndSend() will create a message object and that will be sent to the messagebroker
 
     public GraphService(SimpMessagingTemplate simpMessagingTemplate){
         this.simpMessagingTemplate=simpMessagingTemplate;
@@ -32,7 +32,7 @@ public class GraphService {
         try(BufferedReader reader=new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))){
             String line;
             while((line= reader.readLine())!=null){
-                String[] parts=line.trim().split("\\s+");
+                String[] parts=line.trim().split("\\s+");  // \\S+ sequence of one or more spaces as a seperator
                 if(parts.length>=2){
                     origionalGraph.addEdge(parts[0],parts[1]);
                 }
@@ -52,7 +52,8 @@ public class GraphService {
 
     @Async
     public void runSimulation(String strategy) {
-        resetGraph();
+        resetGraph(); // after running the simulation one time .If the graph is already loaded and I want to run the simulation other time then we have to reset the graph to origional graph
+        // reseting the graph at the start is important as runSimulation is async .Suppose two threads are running this function parellely and thread B starts when thread A partially distroyed graph Thread B will run simulations on this partially distroyed graph
         int initialNodeCount=graph.getNodeCount();
         if(initialNodeCount==0) return;
         List<String> nodesToRemove;
@@ -68,7 +69,7 @@ public class GraphService {
         }
         int removedCount=0;
         //intial state before any removal
-        broadcastMetrics(0,initialNodeCount,"RUNNING");
+        broadcastMetrics(0,initialNodeCount,"STARTED");
 
         for(String nodeId: nodesToRemove){
             if(graph.getNodes().containsKey(nodeId)){
@@ -91,7 +92,7 @@ public class GraphService {
                 removedCount,
                 percentageRemoved,
                 (int) metrics.get("lccSize"),
-                (int) metrics.get("numComponents"),
+                (int) metrics.get("numComp"),
                 status
         );
 
@@ -99,7 +100,7 @@ public class GraphService {
         simpMessagingTemplate.convertAndSend("/topic/metrics",result);
 
         try{
-            Thread.sleep(100);
+            Thread.sleep(2000);
         }
         catch (InterruptedException e){
             Thread.currentThread().interrupt();
@@ -142,10 +143,31 @@ public class GraphService {
         return metrics;
     }
     private List<String> getNodesByDegree(){
-        return graph.getAdjacencyList().entrySet().stream().
+        return graph.getAdjacencyList().entrySet().stream(). // entrySet() converts the map into a java Set of key value pairs
+                // stream will convert that Set to java stream .A stream is a sequence of elements which can be processed in a pipeline
                 sorted((e1,e2)->Integer.compare(e2.getValue().size(),e1.getValue().size())).
-                map(Map.Entry::getKey).
-                collect(Collectors.toList());
+                map(Map.Entry::getKey). // extracts each element' key only
+                collect(Collectors.toList()); // it collects all the String id's from the stream and make a list of them
     }
 
 }
+
+
+// file handling
+// streams: byte stream for images,videos
+// character stream: for characters
+// java.io packege
+// the stream class
+// stream->directly linked to our io divices
+//System.in-> in -> reference variable of type inputstream
+
+// byte stream: inputstream and outputstream
+// char stream: reader and writer
+
+// these are abstract class which will have read and write
+// Io Exception:corupt file,file not found etc
+// in inputstream we can also add characters as they are byte data
+// Input stream reader converts byte data to character data
+
+// we don't have to close inputstreamreader because try catch will close that
+// isr.read() its reads single character doesn't return the character itself but its unicode value

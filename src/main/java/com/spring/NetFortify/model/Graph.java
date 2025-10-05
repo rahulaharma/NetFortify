@@ -10,18 +10,20 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Getter
 public class Graph {
     private final Map<String,Node> nodes=new ConcurrentHashMap<>();
-    private final Map<String, List<String>> adjacencyList=new ConcurrentHashMap<>();
+    private final Map<String, List<String>> adjacencyList=new ConcurrentHashMap<>(); // concurrent hashmap is used for thread safty . Multiple threads can read and write the data simountionasly from a normal hashmap leading to data inconsistency
 
     public void addNode(String id){
         nodes.putIfAbsent(id,new Node(id));
-        adjacencyList.putIfAbsent(id,new CopyOnWriteArrayList<>());
+        adjacencyList.putIfAbsent(id,new CopyOnWriteArrayList<>());  // it is different from normal arraylist as it is thread safe
+        // the reader thread will work on a perticular snapshot of the list
+        // the writer will create a copy of the origional list and extra element it and make it the new list but reader reading the previous list
     }
 
     public void addEdge(String sourceId,String destId){
         addNode(sourceId);
         addNode(destId);
 
-        //Assuming a undirected graph as of now
+        //Assuming an undirected graph as of now
         adjacencyList.get(sourceId).add(destId);
         adjacencyList.get(destId).add(sourceId);
     }

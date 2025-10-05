@@ -15,14 +15,15 @@ import java.io.IOException;
 @RequestMapping("/api/graph")
 public class GraphController {
 
-    private GraphService graphService;
+    private final GraphService graphService;
 
     public GraphController(GraphService graphService){
         this.graphService=graphService;
     }
     
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadGraph(@RequestParam("file") MultipartFile file){
+    public ResponseEntity<String> uploadGraph(@RequestParam("file") MultipartFile file){// @RequestParm(name) : look for a paremeter named "name" in the HTTP request  Multipartfile is the object to store the uploaded file
+        //Normal File object could be used to interect if the file was on servers filesystem
         try{
             graphService.loadGraph(file);
             return ResponseEntity.ok("Graph loaded successfully! Nodes:"+graphService.getGraph().getNodeCount());
